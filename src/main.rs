@@ -31,7 +31,6 @@ fn main() {
     for i in &args[1..] {
         bar.inc(1);
 
-        // die while encountering unsupported formats
         let img = image::open(&i).unwrap();
         let width = img.dimensions().0;
         let height = img.dimensions().1;
@@ -39,36 +38,31 @@ fn main() {
         // determine whether pics are too small and inform the user
         if width < 512 && height < 512 {
             too_small_exist = true;
-            println!("This image \"{}\" seems to be too small. A poor result may be expected.", i);
+            ProgressBar::println(&bar, format!("This image \"{}\" is too small. A poor result may be expected.", i));
         }
 
         // resize: select the longer side and resize to 512px, preserving ratio
-        let ratio: f64 = (width / height) as f64;
-        // 0: width; 1: height
-        let mut longer_side: i32 = 0;
-        if width < height {
-            longer_side = 1;
-        }
-        match longer_side {
-            0 => {
-                let resized_width = 512;
-                let resized_height = 512 as f64 * &ratio;
-                img.resize(resized_width, resized_height as u32, FilterType::Nearest);
+        let ratio = width as f64 / height as f64;
+        match width > height {
+            true => {
+                let nwidth = 512;
+                let nheight = (512 as f64 * ratio) as u32 + 1;
+                let nimg = img.resize(nwidth, nheight, FilterType::Lanczos3);
+                nimg.save(format!("{}.resized.png", i)).unwrap();
             }
-            1 => {
-                let resized_width = 512 as f64 * &ratio;
-                let resized_height = 512;
-                img.resize(resized_width as u32, resized_height, FilterType::Nearest);
+            false => {
+                let nwidth = (512 as f64 * ratio) as u32 + 1;
+                let nheight = 512;
+                let nimg = img.resize(nwidth, nheight, FilterType::Lanczos3);
+                nimg.save(format!("{}.resized.png", i)).unwrap();
             }
-            _ => ()
         }
-        img.save(format!("{}.resized.png", i)).unwrap();
     }
 
     bar.finish();
     println!("All done! Have fun!");
     if too_small_exist == true {
-        println!("HINT: You can use upscaling tools such as waifu2x on your pictures before drag into resizer.");
+        println!("HINT: You can use upscaling tools such as waifu2x on your pictures before dragging them into resizer.");
     }
     graceful_shutdown(0);
 }

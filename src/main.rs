@@ -31,7 +31,14 @@ fn main() {
     for i in &args[1..] {
         bar.inc(1);
 
-        let img = image::open(&i).unwrap();
+        let img = image::open(&i);
+        let img = match img {
+            Ok(file) => file,
+            Err(_) => {
+                ProgressBar::println(&bar, format!("ERROR: Unsupported or broken file: {}", i));
+                continue;
+            }
+        };
         let width = img.dimensions().0;
         let height = img.dimensions().1;
 

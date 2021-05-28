@@ -78,7 +78,7 @@ jobs:
           args: --release
           use-cross: true
 
-      - run: ren target/release/telegram_sticker_batch_resizer.exe target/release/telegram_sticker_batch_resizer-windows-x86_64.exe
+      - run: Rename-Item target/release/telegram_sticker_batch_resizer.exe telegram_sticker_batch_resizer-windows-x86_64.exe
       
       - name: Release
         uses: softprops/action-gh-release@v1

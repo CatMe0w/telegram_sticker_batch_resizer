@@ -77,6 +77,8 @@ jobs:
           command: build
           args: --release
           use-cross: true
+        env:
+          RUSTFLAGS: '-Ctarget-feature=+crt-static'
 
       - run: Rename-Item target/release/telegram_sticker_batch_resizer.exe telegram_sticker_batch_resizer-windows-x86_64.exe
       

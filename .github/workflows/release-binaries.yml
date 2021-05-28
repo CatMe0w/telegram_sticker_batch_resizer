@@ -1,14 +1,15 @@
 name: release-binaries
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v[0-9]+.*'
 
 jobs:
   linux-x86_64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -16,26 +17,26 @@ jobs:
           toolchain: stable
           default: true
 
-      - name: Build binary
+      - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target x86_64-unknown-linux-musl
           use-cross: true
-          
-      - name: Upload binary
-        uses: actions/upload-release-asset@v1
+
+      - run: mv target/x86_64-unknown-linux-musl/release/telegram_sticker_batch_resizer target/x86_64-unknown-linux-musl/release/telegram_sticker_batch_resizer-linux-x86_64
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/x86_64-unknown-linux-musl/release/telegram_sticker_batch_resizer-linux-x86_64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_name: telegram_sticker_batch_resizer-${{ github.event.release.tag-name }}-linux-x86_64
-          asset_path: target/x86_64-unknown-linux-musl/release/telegram_sticker_batch_resizer
-          upload_url: ${{ github.event.release.upload_url }}
 
   macos-x86_64:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -43,26 +44,26 @@ jobs:
           toolchain: stable
           default: true
 
-      - name: Build binary
+      - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release
           use-cross: true
 
-      - name: Upload binary
-        uses: actions/upload-release-asset@v1
+      - run: mv target/release/telegram_sticker_batch_resizer target/release/telegram_sticker_batch_resizer-macos-x86_64
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/release/telegram_sticker_batch_resizer-macos-x86_64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_name: telegram_sticker_batch_resizer-${{ github.event.release.tag-name }}-macos-x86_64
-          asset_path: target/release/telegram_sticker_batch_resizer
-          upload_url: ${{ github.event.release.upload_url }}
 
   windows-x86_64:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -70,18 +71,18 @@ jobs:
           toolchain: stable
           default: true
 
-      - name: Build binary
+      - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release
           use-cross: true
 
-      - name: Upload binary
-        uses: actions/upload-release-asset@v1
+      - run: ren target/release/telegram_sticker_batch_resizer.exe target/release/telegram_sticker_batch_resizer-windows-x86_64.exe
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/release/telegram_sticker_batch_resizer-windows-x86_64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_name: telegram_sticker_batch_resizer-${{ github.event.release.tag-name }}-windows-x86_64.exe
-          asset_path: target/release/telegram_sticker_batch_resizer.exe
-          upload_url: ${{ github.event.release.upload_url }}

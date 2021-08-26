@@ -1,6 +1,6 @@
 [package]
 name = "telegram_sticker_batch_resizer"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["CatMe0w <catme0w@live.cn>"]
 edition = "2018"
 
